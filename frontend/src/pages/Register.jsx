@@ -1,16 +1,61 @@
-import React from 'react';
+import React, {useState, useffect} from 'react';
 import styled from 'styled-components'
 import {Link} from 'react-router-dom'
-import Logo from "../assets/logo.png"
+import axios from 'axios';
+import {ToastContainer,toast} from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import Logo from "../assets/logo.png";
+import { registerRoute } from '../utils/APIRoutes';
 
 function Register() {
-    const handleSubmit = (event) => {
+    const [values, setValues] = useState({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+    const toastOptions = {
+        position: "bottom-right",
+        autoClose: 8000,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark", 
+       };
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        alert("form");
+        if (handleValidation()) {
+            const {password,confirmPassword,username,email} = values;
+              const {data} = await axios.post(registerRoute, {
+                username,
+                email,
+                password,
+              } );
+        };
     };
 
+    const handleValidation =()=> {
+        const {password,confirmPassword,username,email} = values;
+        if(password !== confirmPassword) {
+            console.log(toast)
+           toast.error("password and confirm password should match", toastOptions);
+           return false;
+        } else if (username.length< 3 && username.length > 20) {
+            toast.error("username should be between 3 to 20 characters long", toastOptions);
+           return false;
+        }
+        else if (password.length < 5) {
+            toast.error("Password should be more than 5 characters long", toastOptions);
+           return false;
+        }
+        else if (email === "") {
+            toast.error("Email is required", toastOptions);
+           return false;
+        }
+        return true;
+    }
+
     const handleChange = (event) => {
-        
+        setValues({...values, [event.target.name]: event.target.value});
     }
     return <>
     <FormContainer>
@@ -27,6 +72,9 @@ function Register() {
             <span>Already have an account? <Link to ="/login">Login</Link></span>
         </form>
     </FormContainer>
+    <ToastContainer>
+
+    </ToastContainer>
     </>
 }
 
@@ -66,7 +114,7 @@ const FormContainer = styled.div`
     padding: 1rem;
     border: 0.1rem solid #4e0eff;
     border-radius: 0.4rem;
-    color: white;
+    color: black;
     width: 100%;
     font-size: 1rem;
     &:focus {
