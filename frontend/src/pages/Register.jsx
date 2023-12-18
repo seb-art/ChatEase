@@ -1,63 +1,88 @@
-import React, {useState, useffect} from 'react';
-import styled from 'styled-components'
-import {Link} from 'react-router-dom'
-import axios from 'axios';
-import {ToastContainer,toast} from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import styled from "styled-components";
+import { useNavigate, Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
-import { registerRoute } from '../utils/APIRoutes';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { registerRoute } from "../utils/APIRoutes";
 
-function Register() {
-    const [values, setValues] = useState({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-    });
-    const toastOptions = {
-        position: "bottom-right",
-        autoClose: 8000,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark", 
-       };
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (handleValidation()) {
-          console.log("in validation", registerRoute)
-            const {password,confirmPassword,username,email} = values;
-            const {data} = await axios.post(registerRoute, {
-                username,
-                email,
-                password,
-              } );
-        };
-    };
+export default function Register() {
+  const navigate = useNavigate();
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+  const [values, setValues] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    const handleValidation =()=> {
-        const {password,confirmPassword,username,email} = values;
-        if(password !== confirmPassword) {
-            console.log(toast)
-           toast.error("password and confirm password should match", toastOptions);
-           return false;
-        } else if (username.length< 3 && username.length > 20) {
-            toast.error("username should be between 3 to 20 characters long", toastOptions);
-           return false;
-        }
-        else if (password.length < 5) {
-            toast.error("Password should be more than 5 characters long", toastOptions);
-           return false;
-        }
-        else if (email === "") {
-            toast.error("Email is required", toastOptions);
-           return false;
-        }
-        return true;
+  useEffect(() => {
+    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
+      navigate("/");
+    }
+  },);
+
+  const handleChange = (event) => {
+    setValues({ ...values, [event.target.name]: event.target.value });
+  };
+
+  const handleValidation = () => {
+    const { password, confirmPassword, username, email } = values;
+    if (password !== confirmPassword) {
+      toast.error(
+        "Password and confirm password should be same.",
+        toastOptions
+      );
+      return false;
+    } else if (username.length < 3) {
+      toast.error(
+        "Username should be greater than 3 characters.",
+        toastOptions
+      );
+      return false;
+    } else if (password.length < 8) {
+      toast.error(
+        "Password should be equal or greater than 8 characters.",
+        toastOptions
+      );
+      return false;
+    } else if (email === "") {
+      toast.error("Email is required.", toastOptions);
+      return false;
     }
 
-    const handleChange = (event) => {
-        setValues({...values, [event.target.name]: event.target.value});
+    return true;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (handleValidation()) {
+      const { email, username, password } = values;
+      const { data } = await axios.post(registerRoute, {
+        username,
+        email,
+        password,
+      });
+
+      if (data.status === false) {
+        toast.error(data.msg, toastOptions);
+      }
+      if (data.status === true) {
+        localStorage.setItem(
+          process.env.REACT_APP_LOCALHOST_KEY,
+          JSON.stringify(data.user)
+        );
+        navigate("/");
+      }
     }
+  };
     return <>
     <FormContainer>
         <form onSubmit={(event)=>handleSubmit(event)}>
@@ -147,4 +172,3 @@ const FormContainer = styled.div`
     }
   }
 `;
-export default Register;
