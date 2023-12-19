@@ -27,7 +27,7 @@ export default function Register() {
     if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
     }
-  },);
+  }, []);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -83,25 +83,48 @@ export default function Register() {
       }
     }
   };
-    return <>
-    <FormContainer>
-        <form onSubmit={(event)=>handleSubmit(event)}>
-            <div className="brand">
-                <img src={Logo} alt="Logo" />
-                <h1>chatEase</h1>
-            </div>
-            <input type="text" placeholder="Username" name = "username" onChange={e=>handleChange(e)}/>
-            <input type="email" placeholder="Email" name = "email" onChange={e=>handleChange(e)}/>
-            <input type="password" placeholder="Password" name = "password" onChange={e=>handleChange(e)}/>
-            <input type="password" placeholder="Confirm Password" name = "confirmPassword" onChange={e=>handleChange(e)}/>
-            <button type="submit">Register</button>
-            <span>Already have an account? <Link to ="/login">Login</Link></span>
-        </form>
-    </FormContainer>
-    <ToastContainer>
 
-    </ToastContainer>
+  return (
+    <>
+      <FormContainer>
+        <form action="" onSubmit={(event) => handleSubmit(event)}>
+          <div className="brand">
+            <img src={Logo} alt="logo" />
+            <h1>chatEase</h1>
+          </div>
+          <input
+            type="text"
+            placeholder="Username"
+            name="username"
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            name="email"
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            name="password"
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            name="confirmPassword"
+            onChange={(e) => handleChange(e)}
+          />
+          <button type="submit">Register</button>
+          <span>
+            Already have an account ? <Link to="/login">Login.</Link>
+          </span>
+        </form>
+      </FormContainer>
+      <ToastContainer />
     </>
+  );
 }
 
 const FormContainer = styled.div`

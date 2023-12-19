@@ -7,7 +7,7 @@ const app = express();
 require('dotenv').config();
 
 app.use(express.json());
-app.use(cors({ origin: true }));
+app.use(cors());
 
 app.use("/api/auth", userRoutes)
 
@@ -22,11 +22,6 @@ mongoose.connect(process.env.MONGO_URL, {
 })
 
 
-app.post("/authenticate", async (req, res) => {
-    const { username } = req.body;
-    return res.json({ username: username, secret: "sha256..." });
-});
-
-app.listen(() => {
-    console.log(`server listening at port ${process.env.PORT}`)
-});
+const server = app.listen(process.env.PORT, () =>
+  console.log(`Server Listening on port ${process.env.PORT}`)
+);
