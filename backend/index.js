@@ -1,29 +1,39 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
 const mongoose = require('mongoose');
+const accountRoutes = require('./accounts/routes/accountRoutes')
 
 const app = express();
-require('dotenv').config();
+const port = process.env.PORT || 5000;
 
+app.set('view engine', 'ejs');  // Set the view engine to 'ejs'
+app.use(express.static('public'));
 app.use(express.json());
-app.use(cors({ origin: true }));
 
-
-mongoose.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log("Database was connected successfully")
-}).catch((err) => {
-    console.log(err.message);
-})
-
-
-app.post("/authenticate", async (req, res) => {
-    const { username } = req.body;
-    return res.json({ username: username, secret: "sha256..." });
+// CORS middleware
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    next();
 });
 
-app.listen(() => {
-    console.log(`server listening at port ${process.env.PORT}`)
-});
+// MongoDB connection and route setup
+const dbURI = process.env.DB_URL;
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+        console.log("Connected to MongoDB");
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    })
+    .catch((err) => {
+        console.error("Error connecting to MongoDB:", err);
+    });
+
+app.use(accountRoutes);
