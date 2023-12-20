@@ -84,7 +84,7 @@ export default function Login() {
           />
           <button type="submit">Log In</button>
           <span>
-            Don't have an account ? <Link to="/register">Register.</Link>
+            Don't have an account ? <Link to="/register">Register</Link>
           </span>
         </form>
       </FormContainer>
@@ -161,3 +161,4 @@ const FormContainer = styled.div`
     }
   }
 `;
+
